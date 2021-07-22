@@ -56,3 +56,37 @@ BNNs (1-bit networks) running on the PYNQ-Z1 platform. Over time the
 examples were extended to multi-bit quantization,
 but the name was kept unchanged as the repo had many users.
 This is why we still refer to these networks as BNN-PYNQ networks.
+
+## Quickstart
+Instructions to build "cnv-w1a1" for PYNQ-Z2 in Vivado 2019.1 saving the 
+stitched IP in addition to the bitfile. Make sure you have docker installed 
+and you're in the docker group.
+
+Checking out examples and FINN and model ONNX files (one time):
+```bash
+git clone git@github.com:fastmachinelearning/finn-examples
+cd finn-examples/build
+source get-finn.sh
+cd bnn-pynq/models
+source download_bnn_pynq_models.sh
+```
+
+Setup (each time):
+```bash
+source /path/to/Vivado/2019.1/settings64.sh 
+export VIVADO_PATH=/path/to/Vivado/2019.1
+export PYNQ_BOARD=Pynq-Z2
+export FINN_HOST_BUILD_DIR=/tmp/finn_dev_${USER}
+export FINN_EXAMPLES=/path/to/finn-examples
+```
+
+Run build in docker container:
+```bash
+cd $FINN_EXAMPLES/build/finn
+./run-docker.sh build_custom $FINN_EXAMPLES/build/bnn-pynq
+```
+
+Output is located in:
+```bash
+ls $FINN_EXAMPLES/build/bnn-pynq/output_cnv-w1a1_Pynq-Z2
+```
