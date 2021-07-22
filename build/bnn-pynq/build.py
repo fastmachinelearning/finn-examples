@@ -8,17 +8,12 @@ import shutil
 # the BNN-PYNQ models -- these all come as exported .onnx models
 # see models/download_bnn_pynq_models.sh
 models = [
-    "tfc-w1a1",
-    "tfc-w1a2",
-    "tfc-w2a2",
-    "cnv-w1a1",
-    "cnv-w1a2",
-    "cnv-w2a2",
+    "cnv-w1a1"
 ]
 
 # which platforms to build the networks for
-zynq_platforms = ["Pynq-Z1", "Ultra96", "ZCU104"]
-alveo_platforms = ["U250"]
+zynq_platforms = ["Pynq-Z2"]
+alveo_platforms = []
 platforms_to_build = zynq_platforms + alveo_platforms
 
 
@@ -58,7 +53,7 @@ for platform_name in platforms_to_build:
             board=platform_name,
             shell_flow_type=shell_flow_type,
             vitis_platform=vitis_platform,
-            generate_outputs=[build_cfg.DataflowOutputType.BITFILE],
+            generate_outputs=[build_cfg.DataflowOutputType.STITCHED_IP, build_cfg.DataflowOutputType.BITFILE],
             save_intermediate_models=True,
         )
         model_file = "models/%s.onnx" % model_name
