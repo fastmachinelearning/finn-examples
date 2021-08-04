@@ -32,7 +32,7 @@ FINN_EXAMPLES=/path/to/finn-examples
 # cd into finn submodule
 cd $FINN_EXAMPLES/build/finn
 # launch the build on the bnn-pynq folder
-./run-docker.sh build_custom /path/to/finn-examples/build/bnn-pynq
+bash run-docker.sh build_custom /path/to/finn-examples/build/bnn-pynq
 ```
 
 5. The generated outputs will be under `bnn-pynq/output_<topology>_<platform>`. You can find a description of the generated files [here](https://finn-dev.readthedocs.io/en/latest/command_line.html#simple-dataflow-build-mode).
@@ -83,7 +83,7 @@ export FINN_EXAMPLES=/path/to/finn-examples
 Run build in docker container:
 ```bash
 cd $FINN_EXAMPLES/build/finn
-./run-docker.sh build_custom $FINN_EXAMPLES/build/bnn-pynq
+bash run-docker.sh build_custom $FINN_EXAMPLES/build/bnn-pynq
 ```
 
 Output is located in:
