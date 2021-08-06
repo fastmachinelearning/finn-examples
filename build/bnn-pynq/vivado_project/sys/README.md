@@ -10,6 +10,6 @@ make sys-gui
 # make sys
 ```
 
-![Vivado Block Diagram](docs/block_diagram.png)
+![Vivado Block Diagram](docs/block_design.png)
 
 ![Resources](docs/resources.png)
