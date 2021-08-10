@@ -10,7 +10,7 @@ One time only:
 
 In any new console:
 ```
-conda finn-env
+conda activate finn-env
 ```
 
 ## Run
