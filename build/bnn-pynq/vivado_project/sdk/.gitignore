@@ -4,3 +4,4 @@ finn_*_standalone_bsp
 RemoteSystemsTempFiles
 SDK.log
 .metadata
+.sdk
