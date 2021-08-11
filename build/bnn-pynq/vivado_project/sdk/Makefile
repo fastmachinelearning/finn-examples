@@ -10,7 +10,7 @@ setup:
 
 sdk: setup
 	rm -f $(ACCNAME)_standalone/src/helloworld.c
-	cd  $(ACCNAME)_standalone/src && ln -s ../../common/main.c
+	cd  $(ACCNAME)_standalone/src && ln -s ../../common/main.c && ln -s ../../common/src.h && ln -s ../../common/dst.h
 .PHONY: sdk
 
 #sdk-irq: setup data

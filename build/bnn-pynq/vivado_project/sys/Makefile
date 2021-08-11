@@ -1,3 +1,5 @@
+PROJECT = finn_cnv_w1a1_project
+
 help:
 	@echo "INFO: make <TAB> for targets"
 .PHONY: help
