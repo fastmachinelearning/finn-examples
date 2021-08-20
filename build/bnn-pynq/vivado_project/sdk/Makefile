@@ -4,21 +4,23 @@ help:
 	@echo "INFO: make <TAB> to show targets"
 .PHONY: help
 
-setup:
-	xsct script.tcl $(ACCNAME)
-.PHONY: setup
+--axidma-setup:
+	xsct axidma_script.tcl $(ACCNAME)
+.PHONY: --axidma-setup
 
-sdk: setup
-	rm -f $(ACCNAME)_standalone/src/helloworld.c
-	cd  $(ACCNAME)_standalone/src && ln -s ../../common/main.c && ln -s ../../common/src.h && ln -s ../../common/dst.h
-.PHONY: sdk
+axidma-sdk: --axidma-setup
+	rm -f $(ACCNAME)_axidma_standalone/src/helloworld.c
+	cd  $(ACCNAME)_axidma_standalone/src && ln -s ../../common/axidma_main.c main.c && ln -s ../../common/src.h && ln -s ../../common/dst.h
+.PHONY: axidma-sdk
 
-#sdk-irq: setup data
-#	rm -f $(PROJECT)/src/helloworld.c
-#	cd  $(PROJECT)/src && ln -s ../../../common/main_irq.c main.c
-#	#rm -f $(PROJECT_I2C)/src/helloworld.c
-#	#cd  $(PROJECT_I2C)/src && ln -s ../../../main_i2c_test.c
-#.PHONY: sdk-irq
+--hlsmover-setup:
+	xsct hlsmover_script.tcl $(ACCNAME)
+.PHONY: --hlsmover-setup
+
+hlsmover-sdk: --hlsmover-setup
+	rm -f $(ACCNAME)_hlsmover_standalone/src/helloworld.c
+	cd  $(ACCNAME)_hlsmover_standalone/src && ln -s ../../common/hlsmover_main.c main.c && ln -s ../../common/src.h && ln -s ../../common/dst.h
+.PHONY: hlsmover-sdk
 
 gui:
 	xsdk --workspace .
