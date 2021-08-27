@@ -1,6 +1,6 @@
 PROJECT_AXIDMA = finn_cnv_w1a1_project
 
-PROJECT_DIR_HLSMOVER = $(shell ls -td -- /tmp/finn_dev_$$USER/vivado_*/ | head -n 1)
+PROJECT_DIR_HLSMOVER = $(shell ls -td -- /tmp/finn_hlsmover_dev_$$USER/vivado_*/ | head -n 1)
 
 help:
 	@echo "INFO: make <TAB> for targets"
