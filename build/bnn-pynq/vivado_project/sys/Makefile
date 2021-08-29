@@ -27,5 +27,5 @@ gui-hlsmover:
 .PHONY: gui-hlsmover
 
 clean:
-	rm -rf *.log *.txt *.jou *.str *_project NA
+	rm -rf *.log *.txt *.jou *.str *_project NA .Xil
 .PHONY: clean
