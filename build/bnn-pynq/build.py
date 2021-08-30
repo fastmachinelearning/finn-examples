@@ -12,10 +12,11 @@ models = [
 ]
 
 # which platforms to build the networks for
-zynq_platforms = ["Pynq-Z2"]
+zynq_platforms = ["Pynq-Z1"]
 alveo_platforms = []
 platforms_to_build = zynq_platforms + alveo_platforms
 
+datamover = "hlsmover"
 
 # determine which shell flow to use for a given platform
 def platform_to_shell(platform):
@@ -46,7 +47,7 @@ for platform_name in platforms_to_build:
     for model_name in models:
         # set up the build configuration for this model
         cfg = build_cfg.DataflowBuildConfig(
-            output_dir="output_%s_%s" % (model_name, release_platform_name),
+            output_dir="output_%s_%s_%s" % (datamover, model_name, release_platform_name),
             folding_config_file="folding_config/%s_folding_config.json" % model_name,
             synth_clk_period_ns=10.0,
             board=platform_name,
