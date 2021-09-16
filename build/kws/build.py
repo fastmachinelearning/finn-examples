@@ -70,8 +70,8 @@ model_name = (
     "at_output_usigned_non-narrow_relu_act_FINN"
 )
 model_file = model_name + ".onnx"
-# platform_name = "Pynq-Z1"
-platform_name = "ZCU104"
+platform_name = "Pynq-Z1"
+# platform_name = "ZCU104"
 output_dir = f"{time.time():.2f}_output_{model_name}_{platform_name}"
 
 cfg = build_cfg.DataflowBuildConfig(
@@ -80,7 +80,7 @@ cfg = build_cfg.DataflowBuildConfig(
     steps=build_steps,
     generate_outputs=build_outputs,
     output_dir=output_dir,
-    target_fps=2000000,
+    target_fps=200000,
     synth_clk_period_ns=10.0,
     board=platform_name,
     shell_flow_type=build_cfg.ShellFlowType.VIVADO_ZYNQ,
