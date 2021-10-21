@@ -59,6 +59,7 @@ build_outputs = [
     build_cfg.DataflowOutputType.DEPLOYMENT_PACKAGE,
 ]
 verification_steps = [
+    build_cfg.VerificationStepType.QONNX_TO_FINN_PYTHON,
     build_cfg.VerificationStepType.TIDY_UP_PYTHON,
     build_cfg.VerificationStepType.STREAMLINED_PYTHON,
     build_cfg.VerificationStepType.FOLDED_HLS_CPPSIM,
@@ -70,10 +71,20 @@ model_name = (
     "at_output_usigned_non-narrow_relu_act_FINN"
 )
 model_file = model_name + ".onnx"
-platform_name = "Pynq-Z1"
-# platform_name = "ZCU104"
-output_dir = f"{time.time():.2f}_output_{model_name}_{platform_name}"
 
+# Change the ONNX opset from version 9 to 11, which adds support for the TopK node
+from finn.core.modelwrapper import ModelWrapper
+model = ModelWrapper(model_file)
+model.model.opset_import[0].version = 11
+model_file = model_file.replace(".onnx", "_opset-11.onnx")
+model.save(model_file)
+
+# platform_name = "Ultra96"
+# platform_name = "Pynq-Z1"
+platform_name = "ZCU104"
+output_dir = f"{time.time():.2f}_output_{model_name.replace('/','_')}_{platform_name}"
+
+# Configure build
 cfg = build_cfg.DataflowBuildConfig(
     # steps=estimate_steps, generate_outputs=estimate_outputs,
     verify_steps=verification_steps,
@@ -85,7 +96,10 @@ cfg = build_cfg.DataflowBuildConfig(
     board=platform_name,
     shell_flow_type=build_cfg.ShellFlowType.VIVADO_ZYNQ,
     save_intermediate_models=True,
+    stitched_ip_gen_dcp=True,
+    verify_save_full_context=True,
 )
+# Build the model
 build.build_dataflow_cfg(model_file, cfg)
 
 # Save Build config
