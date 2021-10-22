@@ -80,8 +80,8 @@ model_file = model_file.replace(".onnx", "_opset-11.onnx")
 model.save(model_file)
 
 # platform_name = "Ultra96"
-# platform_name = "Pynq-Z1"
-platform_name = "ZCU104"
+platform_name = "Pynq-Z1"
+# platform_name = "ZCU104"
 output_dir = f"{time.time():.2f}_output_{model_name.replace('/','_')}_{platform_name}"
 
 # Configure build
