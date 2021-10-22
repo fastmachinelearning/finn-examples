@@ -67,8 +67,8 @@ verification_steps = [
 ]
 
 model_name = (
-    "MLP_W3A3_scale_init-0.1_no_per_channel_scaling_"
-    "at_output_usigned_non-narrow_relu_act_FINN"
+    "new_ONNX_exports/MLP_W3A3_scale_init-0.1_no_per_channel_"
+    "scaling_at_output_usigned_non-narrow_relu_act_QONNX"
 )
 model_file = model_name + ".onnx"
 
