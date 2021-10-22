@@ -3,6 +3,10 @@ if { $::argc == 1 } {
     set proj finn_zynq_link
     set accname finn_kws_mlp_w3a3
 
+    ###
+    ### Add an ILA for debug (disabled)
+    ###
+
     #open_bd_design {$base_dir/$proj.srcs/sources_1/bd/top/top.bd}
     #set_property name idma0_ctrl [get_bd_intf_nets axi_interconnect_0_M00_AXI]
     #set_property name odma0_ctrl [get_bd_intf_nets axi_interconnect_0_M01_AXI]
@@ -34,7 +38,9 @@ if { $::argc == 1 } {
     #    error "ERROR: bitstream generation failed!"
     #}
 
-    # Export the bitstream and the hardware for the SDK
+    ###
+    ### Export the bitstream and the hardware for the SDK, FINN has already did everything for us :-)
+    ###
     puts "INFO: Export hardware..."
     file copy -force $base_dir/$proj.runs/impl_1/top_wrapper.sysdef ../sdk/hdf/$accname\_hlsmover_design_wrapper.hdf
 }
