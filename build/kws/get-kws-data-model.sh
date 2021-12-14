@@ -29,4 +29,4 @@
 
 # Download validation data and model
 wget https://github.com/Xilinx/finn-examples/releases/download/kws/all_validation_KWS_data.npz
-wget https://github.com/Xilinx/finn-examples/releases/download/kws/MLP_W3A3_scale_init-0.1_no_per_channel_scaling_at_output_usigned_non-narrow_relu_act_QONNX.onnx
+wget https://github.com/Xilinx/finn-examples/releases/download/kws/QONNX_model.onnx
