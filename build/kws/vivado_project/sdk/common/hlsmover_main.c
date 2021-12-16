@@ -18,7 +18,7 @@
 #define INPUT_N_FEATURES (490)
 #define OUTPUT_N_FEATURES (1)
 
-#define __BATCH_MODE__
+//#define __BATCH_MODE__
 
 /* Copied these macro definitions from the IODMA IPs */
 #define XSTREAMINGDATAFLOWPARTITION_0_IODMA_0_STREAMINGDATAFLOWPARTITION_0_IODMA_0_CONTROL_ADDR_AP_CTRL      0x00
@@ -173,7 +173,7 @@ void dump_data(const char* label, u8* data, unsigned sample_count, unsigned feat
 /* The top of the hill :-) */
 int main(int argc, char** argv) {
 
-    int status;
+    //int status;
     XTime start, stop;
     double calibration_time;
     double sw_elapsed;

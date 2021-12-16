@@ -17,7 +17,7 @@
 #define INPUT_N_FEATURES (IMG_H * IMG_W * IMG_C)
 #define OUTPUT_N_FEATURES (1)
 
-#define __BATCH_MODE__
+//#define __BATCH_MODE__
 
 //#define __DEBUG__
 #define MAX_PRINT_ELEMENTS 16
@@ -287,7 +287,7 @@ int main(int argc, char** argv) {
     xil_printf("INFO: ");
 #endif
 
-    for (int idx = 0; idx < IMG_N; idx++) {
+    for (int idx = 0; idx < 1 /*IMG_N*/; idx++) {
 #ifdef __DEBUG__
         /* xil_printf("INFO: Image #%u\n\r", idx); */
         xil_printf(".");

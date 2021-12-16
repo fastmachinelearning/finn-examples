@@ -4,14 +4,14 @@ help:
 	@echo "INFO: make <TAB> to show targets"
 .PHONY: help
 
-#--axidma-setup:
-#	xsct axidma_script.tcl $(ACCNAME)
-#.PHONY: --axidma-setup
-#
-#axidma-sdk: --axidma-setup
-#	rm -f $(ACCNAME)_axidma_standalone/src/helloworld.c
-#	cd  $(ACCNAME)_axidma_standalone/src && ln -s ../../common/axidma_main.c main.c && ln -s ../../common/src.h && ln -s ../../common/dst.h
-#.PHONY: axidma-sdk
+--axidma-setup:
+	xsct axidma_script.tcl $(ACCNAME)
+.PHONY: --axidma-setup
+
+axidma-sdk: --axidma-setup
+	rm -f $(ACCNAME)_axidma_standalone/src/helloworld.c
+	cd  $(ACCNAME)_axidma_standalone/src && ln -s ../../common/axidma_main.c main.c && ln -s ../../common/src.h && ln -s ../../common/dst.h
+.PHONY: axidma-sdk
 
 --hlsmover-setup:
 	xsct hlsmover_script.tcl $(ACCNAME)
