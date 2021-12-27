@@ -31,14 +31,14 @@ The following steps are adapted from original instructions by Giuseppe:
 
 ```shell
 cd $FINN_EXAMPLES/build/kws-arty7/vivado_project/sys
-make sys-hlsmover
+make sys
 ```
 
 3. The Vivado script essentially opens the FINN project and export the HDF file for the SDK in the directory `$FINN_EXAMPLES/build/kws/vivado_project/sdk/hdf/`. Note that when we use HLS datamovers we don't have to create our own Vivado project (as with the AXI DMA IP).
 4. Finally, let's create the SDK project + running it:
 ```shell
 cd $FINN_EXAMPLES/build/kws-arty7/vivado_project/sdk
-make hlsmover-sdk gui
+make sdk gui
 ```
 5. This will pop up the SDK, close the "welcome" tab and you should have the baremetal app.
 
