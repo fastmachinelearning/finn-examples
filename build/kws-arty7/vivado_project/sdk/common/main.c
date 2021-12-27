@@ -191,7 +191,7 @@ int main(int argc, char** argv) {
 
     /* Calibration */
     start = start_64b_counter();
-    sleep(30);
+    sleep(1);
     stop = stop_64b_counter();
     calibration_time = get_elapsed_time(start, stop);
     printf("INFO: Time calibration for one second (%f sec)\r\n", calibration_time);
