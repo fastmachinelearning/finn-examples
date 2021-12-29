@@ -214,24 +214,24 @@ connect_bd_net [get_bd_pins mig_7series_0/aresetn] [get_bd_pins proc_sys_reset_m
 # Address Editor
 assign_bd_address [get_bd_addr_segs {mig_7series_0/memmap/memaddr }]
 
-# ILAs
-set_property HDL_ATTRIBUTE.DEBUG true [get_bd_intf_nets {axi_dma_M_AXIS_MM2S}]
-set_property HDL_ATTRIBUTE.DEBUG true [get_bd_intf_nets {finn_design_axis_dwidth_converter_M_AXIS}]
-set_property HDL_ATTRIBUTE.DEBUG true [get_bd_intf_nets {finn_design_m_axis_0}]
-set_property HDL_ATTRIBUTE.DEBUG true [get_bd_intf_nets {axi_dma_M_AXI_MM2S}]
-set_property HDL_ATTRIBUTE.DEBUG true [get_bd_intf_nets {axi_dma_M_AXI_S2MM}]
-set_property HDL_ATTRIBUTE.DEBUG true [get_bd_intf_nets {microblaze_mcu_axi_periph_M02_AXI}]
-
-apply_bd_automation -rule xilinx.com:bd_rule:debug -dict [list \
-    [get_bd_intf_nets finn_design_axis_dwidth_converter_M_AXIS] {AXIS_SIGNALS "Data and Trigger" CLK_SRC "/clk_wizard/clk_out3" SYSTEM_ILA "Auto" APC_EN "0" } \
-    [get_bd_intf_nets axi_dma_M_AXIS_MM2S] {AXIS_SIGNALS "Data and Trigger" CLK_SRC "/clk_wizard/clk_out3" SYSTEM_ILA "Auto" APC_EN "0" } \
-    [get_bd_intf_nets finn_design_m_axis_0] {AXIS_SIGNALS "Data and Trigger" CLK_SRC "/clk_wizard/clk_out3" SYSTEM_ILA "Auto" APC_EN "0" } \
-    [get_bd_intf_nets microblaze_mcu_axi_periph_M02_AXI] {AXI_R_ADDRESS "Data and Trigger" AXI_R_DATA "Data and Trigger" AXI_W_ADDRESS "Data and Trigger" AXI_W_DATA "Data and Trigger" AXI_W_RESPONSE "Data and Trigger" CLK_SRC "/mig_7series_0/ui_clk" SYSTEM_ILA "Auto" APC_EN "0" } \
-    [get_bd_intf_nets axi_dma_M_AXI_MM2S] {AXI_R_ADDRESS "Data and Trigger" AXI_R_DATA "Data and Trigger" AXI_W_ADDRESS "Data and Trigger" AXI_W_DATA "Data and Trigger" AXI_W_RESPONSE "Data and Trigger" CLK_SRC "/clk_wizard/clk_out3" SYSTEM_ILA "Auto" APC_EN "0" } \
-    [get_bd_intf_nets axi_dma_M_AXI_S2MM] {AXI_R_ADDRESS "Data and Trigger" AXI_R_DATA "Data and Trigger" AXI_W_ADDRESS "Data and Trigger" AXI_W_DATA "Data and Trigger" AXI_W_RESPONSE "Data and Trigger" CLK_SRC "/clk_wizard/clk_out3" SYSTEM_ILA "Auto" APC_EN "0" } \
-]
-
-#set_property -dict [list CONFIG.C_BRAM_CNT {51} CONFIG.C_DATA_DEPTH {2048}] [get_bd_cells system_ila_0]
+## ILAs
+#set_property HDL_ATTRIBUTE.DEBUG true [get_bd_intf_nets {axi_dma_M_AXIS_MM2S}]
+#set_property HDL_ATTRIBUTE.DEBUG true [get_bd_intf_nets {finn_design_axis_dwidth_converter_M_AXIS}]
+#set_property HDL_ATTRIBUTE.DEBUG true [get_bd_intf_nets {finn_design_m_axis_0}]
+#set_property HDL_ATTRIBUTE.DEBUG true [get_bd_intf_nets {axi_dma_M_AXI_MM2S}]
+#set_property HDL_ATTRIBUTE.DEBUG true [get_bd_intf_nets {axi_dma_M_AXI_S2MM}]
+#set_property HDL_ATTRIBUTE.DEBUG true [get_bd_intf_nets {microblaze_mcu_axi_periph_M02_AXI}]
+#
+#apply_bd_automation -rule xilinx.com:bd_rule:debug -dict [list \
+#    [get_bd_intf_nets finn_design_axis_dwidth_converter_M_AXIS] {AXIS_SIGNALS "Data and Trigger" CLK_SRC "/clk_wizard/clk_out3" SYSTEM_ILA "Auto" APC_EN "0" } \
+#    [get_bd_intf_nets axi_dma_M_AXIS_MM2S] {AXIS_SIGNALS "Data and Trigger" CLK_SRC "/clk_wizard/clk_out3" SYSTEM_ILA "Auto" APC_EN "0" } \
+#    [get_bd_intf_nets finn_design_m_axis_0] {AXIS_SIGNALS "Data and Trigger" CLK_SRC "/clk_wizard/clk_out3" SYSTEM_ILA "Auto" APC_EN "0" } \
+#    [get_bd_intf_nets microblaze_mcu_axi_periph_M02_AXI] {AXI_R_ADDRESS "Data and Trigger" AXI_R_DATA "Data and Trigger" AXI_W_ADDRESS "Data and Trigger" AXI_W_DATA "Data and Trigger" AXI_W_RESPONSE "Data and Trigger" CLK_SRC "/mig_7series_0/ui_clk" SYSTEM_ILA "Auto" APC_EN "0" } \
+#    [get_bd_intf_nets axi_dma_M_AXI_MM2S] {AXI_R_ADDRESS "Data and Trigger" AXI_R_DATA "Data and Trigger" AXI_W_ADDRESS "Data and Trigger" AXI_W_DATA "Data and Trigger" AXI_W_RESPONSE "Data and Trigger" CLK_SRC "/clk_wizard/clk_out3" SYSTEM_ILA "Auto" APC_EN "0" } \
+#    [get_bd_intf_nets axi_dma_M_AXI_S2MM] {AXI_R_ADDRESS "Data and Trigger" AXI_R_DATA "Data and Trigger" AXI_W_ADDRESS "Data and Trigger" AXI_W_DATA "Data and Trigger" AXI_W_RESPONSE "Data and Trigger" CLK_SRC "/clk_wizard/clk_out3" SYSTEM_ILA "Auto" APC_EN "0" } \
+#]
+#
+##set_property -dict [list CONFIG.C_BRAM_CNT {51} CONFIG.C_DATA_DEPTH {2048}] [get_bd_cells system_ila_0]
 
 # Validate the design block we created
 validate_bd_design
