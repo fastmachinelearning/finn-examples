@@ -122,9 +122,12 @@ int init_axi_dma(u16 device_id) {
 
 /* Golden model of the accelerator in software */
 int finn_cnv_w1a1_sw(u8 *rx, u8 *tx, unsigned img_n, unsigned input_n_features, unsigned output_n_features) {
-    xil_printf("INFO: Golden results are pre-compiled\r\n");
-    xil_printf("INFO: It would be nice to run a software model\r\n");
+    xil_printf("INFO:   Golden results are pre-compiled\r\n");
+    xil_printf("INFO:   It would be nice to run a software model\r\n");
     // See src.h and dst.h for input and golden output respectively.
+    for (int i = 0; i < img_n * output_n_features; i++) {
+        rx[i] = dst_data[i];
+    }
     return 0;
 }
 
@@ -173,13 +176,13 @@ int main(int argc, char** argv) {
     double hw_elapsed = 0;
     double cache_elapsed = 0;
 
+    /* Initialize platform (uart and caches) */
+    init_platform();
+
     xil_printf("\r\n");
     xil_printf("INFO: =========================================================================\r\n");
     xil_printf("INFO: FINN KWS-MLP-W3A3 (w/ polling, AXI DMA, batch = 1)\r\n");
     xil_printf("INFO: =========================================================================\r\n");
-
-    /* Initialize platform (uart and caches) */
-    init_platform();
 
     init_axi_dma(DMA_DEV_ID);
 
@@ -198,11 +201,13 @@ int main(int argc, char** argv) {
 
     /* Initialize memory */
     xil_printf("INFO: Initialize memory\r\n");
-    xil_printf("INFO:   - Total image count: %u\r\n", CMD_CNT);
-    xil_printf("INFO:   - Image batch size: %u\r\n", CMD_N);
-    xil_printf("INFO:   - Input-feature count: %u\r\n", INPUT_N_FEATURES);
-    xil_printf("INFO:   - Output-feature count: %u\r\n", OUTPUT_N_FEATURES);
-    xil_printf("INFO:   - Data size: %u B\r\n", sizeof(u8));
+    xil_printf("INFO:   - Total inputs: %u\r\n", CMD_CNT);
+    xil_printf("INFO:   - Batch size: %u\r\n", CMD_N);
+    xil_printf("INFO:   - Input features: %u\r\n", INPUT_N_FEATURES);
+    xil_printf("INFO:   - Output features: %u\r\n", OUTPUT_N_FEATURES);
+    xil_printf("INFO:   - Single feature data size: %u B\r\n", sizeof(u8));
+    printf("INFO:   - Total input data size: %uB, %.2fKB\r\n", INPUT_N_FEATURES * CMD_CNT * sizeof(u8), (INPUT_N_FEATURES * CMD_CNT * sizeof(u8))/1024.0);
+    printf("INFO:   - Total output data size: %uB, %.2fKB\r\n", OUTPUT_N_FEATURES * CMD_CNT * sizeof(u8), (OUTPUT_N_FEATURES * CMD_CNT * sizeof(u8))/1024.0);
 
     /* Set Heap Size in ldscript.ld to 0x1000000 (16MB) */
     u8 *tx_buffer_ptr = (u8*)malloc(INPUT_N_FEATURES * CMD_CNT * sizeof(u8));
@@ -210,44 +215,32 @@ int main(int argc, char** argv) {
     u8 *rx_buffer_gld_ptr = (u8*)malloc(OUTPUT_N_FEATURES * CMD_CNT * sizeof(u8));
     //malloc_stats();
 
-    /* Load data in the TX/RX buffers */
+    /* Load data in the TX buffer */
     for (int i = 0; i < INPUT_N_FEATURES * CMD_CNT; i++) {
         tx_buffer_ptr[i] = src_data[i];
     }
+    /* Reset the RX buffers */
     for (int i = 0; i < OUTPUT_N_FEATURES * CMD_CNT; i++) {
-        rx_buffer_gld_ptr[i] = dst_data[i];
+        rx_buffer_gld_ptr[i] = 0x0;
         rx_buffer_ptr[i] = 0x0;
     }
 
     /* ****** SOFTWARE REFERENCE ****** */
-#ifdef __DEBUG__
-    xil_printf("INFO: Start SW accelerator\r\n");
-#endif
+    xil_printf("INFO: Run SW reference model\r\n");
     start = start_64b_counter();
-    finn_cnv_w1a1_sw(tx_buffer_ptr, rx_buffer_gld_ptr, CMD_CNT, INPUT_N_FEATURES, OUTPUT_N_FEATURES);
+    finn_cnv_w1a1_sw(rx_buffer_gld_ptr, tx_buffer_ptr, CMD_CNT, INPUT_N_FEATURES, OUTPUT_N_FEATURES);
     stop = stop_64b_counter();
     sw_elapsed = get_elapsed_time(start, stop);
 
 
     /* ****** ACCELERATOR ****** */
-    xil_printf("INFO: Press any key to start the accelerator: ");
+    xil_printf("INFO: Press any key to start the HW accelerator: ");
     dummy = inbyte();
     xil_printf("\r\nINFO: \r\n");
 
-#ifdef __DEBUG__
-    xil_printf("INFO: Configure and start accelerator\r\n");
-#endif
+    xil_printf("INFO: Configure and start HW accelerator\r\n");
 
-#ifdef __DEBUG__
-    xil_printf("INFO: ");
-#endif
-
-#if 1
     for (int idx = 0; idx < CMD_N; idx++) {
-#ifdef __DEBUG__
-        /* xil_printf("INFO: Image #%u\r\n", idx); */
-        xil_printf(".");
-#endif
 
         start = start_64b_counter();
         Xil_DCacheFlushRange((UINTPTR)(tx_buffer_ptr + idx * INPUT_N_FEATURES), INPUT_N_FEATURES * sizeof(u8));
@@ -285,41 +278,36 @@ int main(int argc, char** argv) {
         cache_elapsed += get_elapsed_time(start, stop);
     }
 
-#ifdef __DEBUG__
-    xil_printf("\r\n");
-#endif
-#endif /* __BATCH_MODE__ */
-
     /* ****** VALIDATION ****** */
-
-#ifdef __DEBUG__
     xil_printf("INFO: ============================== Validation ===============================\r\n");
+#ifdef __DEBUG__
     xil_printf("INFO: Dump data\r\n");
-    dump_data("tx_buffer", (u8*)(tx_buffer_ptr), 1, INPUT_N_FEATURES, 1, 0, 0);
-    //dump_data("sw_dst", (u8*)(rx_buffer_gld_ptr), IMG_N, OUTPUT_N_FEATURES, 1, 0);
-    //dump_data("hw_dst", (u8*)(rx_buffer_ptr), IMG_N, OUTPUT_N_FEATURES, 1, 0);
+    dump_data("tx_buffer", (u8*)(tx_buffer_ptr), CMD_N, INPUT_N_FEATURES, 1, 0, 0);
+    //dump_data("sw_dst", (u8*)(rx_buffer_gld_ptr), CMD_N, OUTPUT_N_FEATURES, 1, 0);
+    //dump_data("hw_dst", (u8*)(rx_buffer_ptr), CMD_N, OUTPUT_N_FEATURES, 1, 0);
 #endif
 
-    printf("INFO: Software execution time: %f sec\r\n", sw_elapsed);
-
-    printf("INFO: Total accelerator execution time: %f sec\r\n", hw_elapsed);
-    printf("INFO: Average accelerator execution time: %f sec\r\n", hw_elapsed / CMD_N);
-    printf("INFO: Cache flush time: %f sec\r\n", cache_elapsed);
-    printf("INFO: Accelerator/software speedup (the sofware is fake so this does not count...): %.2f X\r\n", (sw_elapsed >= (hw_elapsed+cache_elapsed))?(sw_elapsed/(hw_elapsed+cache_elapsed)):-((hw_elapsed+cache_elapsed)/sw_elapsed));
+    printf("INFO: Total SW reference model execution time: %f sec\r\n", sw_elapsed);
+    printf("INFO: Total HW accelerator execution time: %f sec\r\n", hw_elapsed);
+    printf("INFO: Average HW accelerator execution time: %f sec\r\n", hw_elapsed / CMD_N);
+    printf("INFO: Total cache flush time: %f sec\r\n", cache_elapsed);
+    //printf("INFO: Accelerator/software speedup (the sofware is fake so this does not count...): %.2f X\r\n", (sw_elapsed >= (hw_elapsed+cache_elapsed))?(sw_elapsed/(hw_elapsed+cache_elapsed)):-((hw_elapsed+cache_elapsed)/sw_elapsed));
 
     /* Accelerator validation */
     hw_errors = 0;
     for (int i = 0; i < OUTPUT_N_FEATURES * CMD_N; i++) {
         if ((rx_buffer_ptr)[i] != (rx_buffer_gld_ptr)[i]) {
 #ifdef __DEBUG__
-            xil_printf("ERROR: [%d]: Accelerator hw %d != sw %d !!!\r\n", i, (rx_buffer_ptr)[i], (rx_buffer_gld_ptr)[i]);
+            xil_printf("ERROR: [%d]: HW accelerator %d != SW reference implementation %d !!!\r\n", i, (rx_buffer_ptr)[i], (rx_buffer_gld_ptr)[i]);
 #endif
             hw_errors++;
         }
     }
 
     double error_rate = hw_errors / ((double) OUTPUT_N_FEATURES * CMD_N);
-    printf("INFO: Total errors = %d (out of %d elements, error rate = %.1f%%)\r\n", hw_errors, OUTPUT_N_FEATURES * CMD_N, error_rate * 100);
+    printf("INFO: Total errors = %d (out of %d elements)\r\n", hw_errors, OUTPUT_N_FEATURES * CMD_N);
+    printf("INFO: Error rate = %.1f%%\r\n", error_rate * 100);
+    printf("INFO: Model accuracy = %.1f%%\r\n", 100 - (error_rate*100));
     if (hw_errors > 0)
         xil_printf("INFO: Accelerator validation: FAIL\r\n");
     else
@@ -328,7 +316,6 @@ int main(int argc, char** argv) {
 
     xil_printf("INFO: Done!\r\n");
     xil_printf("INFO: =========================================================================\r\n");
-
     cleanup_platform();
 
     return 0;
