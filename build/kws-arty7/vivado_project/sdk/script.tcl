@@ -9,7 +9,4 @@ if { $::argc == 1 } {
     configapp -app $accname\_standalone build-config release
     configapp -app finn_kws_mlp_w3a3_standalone -add linker-misc {-Wl,--defsym=_HEAP_SIZE=0x1000000}
     configapp -app finn_kws_mlp_w3a3_standalone -add linker-misc {-Wl,--defsym=_STACK_SIZE=0x40000}
-
-
-    #configapp -app $accname\_standalone -set compiler-optimization {2}
 }

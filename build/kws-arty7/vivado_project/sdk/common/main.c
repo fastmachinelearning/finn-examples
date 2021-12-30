@@ -9,12 +9,23 @@
 #include "src.h"
 #include "dst.h"
 
+#ifdef __USE_OCM__
+#define ITER_N 505100
+#define CMD_CNT (1)
+#ifndef CMD_N
+#define CMD_N (1)
+#endif
+#else
+#define ITER_N 50
 #define CMD_CNT (10102)
 #ifndef CMD_N
 #define CMD_N (10102)
 #endif
+#endif
 #define INPUT_N_FEATURES (490)
 #define OUTPUT_N_FEATURES (1)
+
+
 
 //#define __DEBUG__
 #define MAX_PRINT_ELEMENTS 16
@@ -65,7 +76,7 @@ static XTmrCtr TimerCounterInst;
 #define TIMER_CNTR_0        0
 #define TIMER_CNTR_1        1
 
-u64 get_64b_counter_value() {
+u64 get_32b_counter_value() {
     u64 counter = 0, lo_counter = 0, hi_counter = 0; 
     lo_counter = XTmrCtr_GetValue(&TimerCounterInst, TIMER_CNTR_0);
     //hi_counter = XTmrCtr_GetValue(&TimerCounterInst, TIMER_CNTR_1);
@@ -73,17 +84,17 @@ u64 get_64b_counter_value() {
     return counter;
 }
 
-u64 start_64b_counter() {
+u64 start_32b_counter() {
     XTmrCtr_Start(&TimerCounterInst, TIMER_CNTR_0);
     //XTmrCtr_Start(&TimerCounterInst, TIMER_CNTR_1);
-    u64 value = get_64b_counter_value();
+    u64 value = get_32b_counter_value();
     return value;
 }
 
-u64 stop_64b_counter() {
+u64 stop_32b_counter() {
     XTmrCtr_Stop(&TimerCounterInst, TIMER_CNTR_0);
     //XTmrCtr_Stop(&TimerCounterInst, TIMER_CNTR_1);
-    u64 value = get_64b_counter_value();
+    u64 value = get_32b_counter_value();
     return value;
 }
 
@@ -125,7 +136,7 @@ int finn_cnv_w1a1_sw(u8 *rx, u8 *tx, unsigned img_n, unsigned input_n_features, 
     xil_printf("INFO:   Golden results are pre-compiled\r\n");
     xil_printf("INFO:   It would be nice to run a software model\r\n");
     // See src.h and dst.h for input and golden output respectively.
-    for (int i = 0; i < img_n * output_n_features; i++) {
+    for (u32 i = 0; i < (img_n * output_n_features); i++) {
         rx[i] = dst_data[i];
     }
     return 0;
@@ -193,9 +204,9 @@ int main(int argc, char** argv) {
     }
 
     /* Calibration */
-    start = start_64b_counter();
+    start = start_32b_counter();
     sleep(1);
-    stop = stop_64b_counter();
+    stop = stop_32b_counter();
     calibration_time = get_elapsed_time(start, stop);
     printf("INFO: Time calibration for one second (%f sec)\r\n", calibration_time);
 
@@ -203,6 +214,7 @@ int main(int argc, char** argv) {
     xil_printf("INFO: Initialize memory\r\n");
     xil_printf("INFO:   - Total inputs: %u\r\n", CMD_CNT);
     xil_printf("INFO:   - Batch size: %u\r\n", CMD_N);
+    xil_printf("INFO:   - Iterations: %u\r\n", ITER_N);
     xil_printf("INFO:   - Input features: %u\r\n", INPUT_N_FEATURES);
     xil_printf("INFO:   - Output features: %u\r\n", OUTPUT_N_FEATURES);
     xil_printf("INFO:   - Single feature data size: %u B\r\n", sizeof(u8));
@@ -227,9 +239,9 @@ int main(int argc, char** argv) {
 
     /* ****** SOFTWARE REFERENCE ****** */
     xil_printf("INFO: Run SW reference model\r\n");
-    start = start_64b_counter();
+    start = start_32b_counter();
     finn_cnv_w1a1_sw(rx_buffer_gld_ptr, tx_buffer_ptr, CMD_CNT, INPUT_N_FEATURES, OUTPUT_N_FEATURES);
-    stop = stop_64b_counter();
+    stop = stop_32b_counter();
     sw_elapsed = get_elapsed_time(start, stop);
 
 
@@ -240,15 +252,16 @@ int main(int argc, char** argv) {
 
     xil_printf("INFO: Configure and start HW accelerator\r\n");
 
-    for (int idx = 0; idx < CMD_N; idx++) {
+    for (u32 b = 0; b < ITER_N; b++)
+    for (u32 idx = 0; idx < CMD_N; idx++) {
 
-        start = start_64b_counter();
+        start = start_32b_counter();
         Xil_DCacheFlushRange((UINTPTR)(tx_buffer_ptr + idx * INPUT_N_FEATURES), INPUT_N_FEATURES * sizeof(u8));
         Xil_DCacheFlushRange((UINTPTR)(rx_buffer_ptr + idx * OUTPUT_N_FEATURES), OUTPUT_N_FEATURES * sizeof(u8));
-        stop = stop_64b_counter();
+        stop = stop_32b_counter();
         cache_elapsed = get_elapsed_time(start, stop);
 
-        start = start_64b_counter();
+        start = start_32b_counter();
         status = XAxiDma_SimpleTransfer(&axi_dma, (UINTPTR)(tx_buffer_ptr + idx * INPUT_N_FEATURES), INPUT_N_FEATURES, XAXIDMA_DMA_TO_DEVICE);
         if (status != XST_SUCCESS) {
             xil_printf("ERROR: DMA_TO_DEVICE failed, status %u\r\n", status);
@@ -268,13 +281,13 @@ int main(int argc, char** argv) {
         while (XAxiDma_Busy(&axi_dma, XAXIDMA_DMA_TO_DEVICE)) {
             ; /* Wait */
         }
-        stop = stop_64b_counter();
+        stop = stop_32b_counter();
         hw_elapsed += get_elapsed_time(start, stop);
 
-        start = start_64b_counter();
+        start = start_32b_counter();
         //Xil_DCacheFlushRange((UINTPTR)(rx_buffer_ptr + idx * OUTPUT_N_FEATURES), OUTPUT_N_FEATURES * sizeof(data_t));
         Xil_DCacheInvalidateRange((UINTPTR)(rx_buffer_ptr + idx * OUTPUT_N_FEATURES), OUTPUT_N_FEATURES * sizeof(u8));
-        stop = stop_64b_counter();
+        stop = stop_32b_counter();
         cache_elapsed += get_elapsed_time(start, stop);
     }
 
@@ -289,7 +302,7 @@ int main(int argc, char** argv) {
 
     printf("INFO: Total SW reference model execution time: %f sec\r\n", sw_elapsed);
     printf("INFO: Total HW accelerator execution time: %f sec\r\n", hw_elapsed);
-    printf("INFO: Average HW accelerator execution time: %f sec\r\n", hw_elapsed / CMD_N);
+    printf("INFO: Average HW accelerator execution time: %f sec\r\n", hw_elapsed / (CMD_N * ITER_N));
     printf("INFO: Total cache flush time: %f sec\r\n", cache_elapsed);
     //printf("INFO: Accelerator/software speedup (the sofware is fake so this does not count...): %.2f X\r\n", (sw_elapsed >= (hw_elapsed+cache_elapsed))?(sw_elapsed/(hw_elapsed+cache_elapsed)):-((hw_elapsed+cache_elapsed)/sw_elapsed));
 

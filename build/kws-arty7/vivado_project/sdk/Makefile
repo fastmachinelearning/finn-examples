@@ -13,6 +13,16 @@ sdk: --setup
 	cd  $(ACCNAME)_standalone/src && ln -s ../../common/main.c main.c && ln -s ../../common/src.h && ln -s ../../common/dst.h
 .PHONY: sdk
 
+--setup-ocm:
+	xsct script_ocm.tcl $(ACCNAME)_ocm
+.PHONY: --setup-ocm
+
+sdk-ocm: --setup-ocm
+	rm -f $(ACCNAME)_ocm_standalone/src/helloworld.c
+	cd  $(ACCNAME)_ocm_standalone/src && ln -s ../../common/main.c main.c && ln -s ../../common/src.h && ln -s ../../common/dst.h
+.PHONY: sdk-ocm
+
+
 gui:
 	xsdk --workspace .
 .PHONY: gui

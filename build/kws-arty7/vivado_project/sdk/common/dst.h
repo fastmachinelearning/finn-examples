@@ -1,3 +1,8 @@
+#ifdef __USE_OCM__
+unsigned char dst_data[1] = {
+3,
+};
+#else
 unsigned char dst_data[10102] = {
 3, 
 11, 
@@ -10102,3 +10107,4 @@ unsigned char dst_data[10102] = {
 11, 
 11, 
 };
+#endif

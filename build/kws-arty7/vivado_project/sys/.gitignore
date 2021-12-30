@@ -4,3 +4,5 @@ NA
 *.log
 *.str
 .Xil
+finn_kws_mlp_w3a3_design_wrapper.v
+finn_kws_mlp_w3a3_ocm_design_wrapper.v
