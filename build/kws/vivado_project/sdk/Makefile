@@ -4,23 +4,23 @@ help:
 	@echo "INFO: make <TAB> to show targets"
 .PHONY: help
 
---axidma-setup:
-	xsct axidma_script.tcl $(ACCNAME)
-.PHONY: --axidma-setup
+--setup-axidma:
+	xsct script_axidma.tcl $(ACCNAME)
+.PHONY: --setup-axidma
 
-axidma-sdk: --axidma-setup
+sdk-axidma: --setup-axidma
 	rm -f $(ACCNAME)_axidma_standalone/src/helloworld.c
 	cd  $(ACCNAME)_axidma_standalone/src && ln -s ../../common/axidma_main.c main.c && ln -s ../../common/src.h && ln -s ../../common/dst.h
-.PHONY: axidma-sdk
+.PHONY: sdk-axidma
 
---hlsmover-setup:
-	xsct hlsmover_script.tcl $(ACCNAME)
-.PHONY: --hlsmover-setup
+--setup-hlsmover:
+	xsct script_hlsmover.tcl $(ACCNAME)
+.PHONY: --setup-hlsmover
 
-hlsmover-sdk: --hlsmover-setup
+sdk-hlsmover: --setup-hlsmover
 	rm -f $(ACCNAME)_hlsmover_standalone/src/helloworld.c
 	cd  $(ACCNAME)_hlsmover_standalone/src && ln -s ../../common/hlsmover_main.c main.c && ln -s ../../common/src.h && ln -s ../../common/dst.h
-.PHONY: hlsmover-sdk
+.PHONY: sdk-hlsmover
 
 gui:
 	xsdk --workspace .
