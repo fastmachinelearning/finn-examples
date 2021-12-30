@@ -1,12 +1,12 @@
 # Script
 set module ""
 set debug 0
-set stiched_ip_dir ""
+set stitched_ip_dir ""
 
 if { $argc == 3 } {
     set module [lindex $argv 0]
     set debug [lindex $argv 1]
-    set stiched_ip_dir [lindex $argv 2]
+    set stitched_ip_dir [lindex $argv 2]
 } else {
     puts "Error!"
 }
@@ -30,7 +30,7 @@ create_project $proj $proj_dir -part xc7a100tcsg324-1
 set_property board_part digilentinc.com:arty-a7-100:part0:1.0 [current_project]
 
 # Set IP repository paths
-set_property  ip_repo_paths  $proj_dir/../../../$stiched_ip_dir/stitched_ip/ip [current_project]
+set_property  ip_repo_paths  $proj_dir/../../../$stitched_ip_dir/stitched_ip/ip [current_project]
 update_ip_catalog -rebuild
 
 # Create the design block
