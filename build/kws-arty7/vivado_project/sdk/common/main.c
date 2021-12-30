@@ -25,8 +25,6 @@
 #define INPUT_N_FEATURES (490)
 #define OUTPUT_N_FEATURES (1)
 
-
-
 //#define __DEBUG__
 #define MAX_PRINT_ELEMENTS 16
 
@@ -62,9 +60,6 @@
 
 /* Base address for the AXI DMA */
 #define DMA_DEV_ID XPAR_AXIDMA_0_DEVICE_ID
-
-#define DDR_BASE_ADDR XPAR_MIG_7SERIES_0_BASEADDR
-#define MEM_BASE_ADDR (DDR_BASE_ADDR + 0x1000000)
 
 /* AXI DMA instance */
 XAxiDma axi_dma;
