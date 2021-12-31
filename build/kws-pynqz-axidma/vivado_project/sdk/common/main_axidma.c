@@ -16,7 +16,7 @@
 #define CMD_N (1)
 #endif
 #else
-#define ITER_N 1
+#define ITER_N 50
 #define CMD_CNT (10102)
 #ifndef CMD_N
 #define CMD_N (10102)
@@ -182,10 +182,10 @@ int main(int argc, char** argv) {
     /* malloc_stats(); */
 
     /* Load data in the TX/RX buffers */
-    for (int i = 0; i < INPUT_N_FEATURES * CMD_CNT; i++) {
+    for (u32 i = 0; i < INPUT_N_FEATURES * CMD_CNT; i++) {
         tx_buffer_ptr[i] = src_data[i];
     }
-    for (int i = 0; i < OUTPUT_N_FEATURES * CMD_CNT; i++) {
+    for (u32 i = 0; i < OUTPUT_N_FEATURES * CMD_CNT; i++) {
         rx_buffer_gld_ptr[i] = 0x0;
         rx_buffer_ptr[i] = 0x0;
     }
