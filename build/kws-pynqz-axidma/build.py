@@ -29,7 +29,6 @@
 import finn.builder.build_dataflow as build
 import finn.builder.build_dataflow_config as build_cfg
 
-### AXI-DMA
 from finn.transformation.fpgadataflow.insert_tlastmarker import InsertTLastMarker
 from finn.transformation.general import GiveUniqueNodeNames
 from finn.transformation.fpgadataflow.prepare_ip import PrepareIP
