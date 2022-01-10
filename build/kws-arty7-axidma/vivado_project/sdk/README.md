@@ -5,6 +5,6 @@ Work in progress.
 ## How To Run
 
 ```
-make sdk
+make sdk-ocm
 make gui
 ```
