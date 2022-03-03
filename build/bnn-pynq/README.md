@@ -52,7 +52,7 @@ used here have two additions, as described in the "Adding Pre- and Postprocessin
 
 BNN-PYNQ was the name of the GitHub repo that the FINN team first
 released after the FINN paper was published. Originally, it contained
-BNNs (1-bit networks) running on the PYNQ-Z1 platform. Over time the
+BNNs (1-bit networks) running on the PYNQ-Z2 platform. Over time the
 examples were extended to multi-bit quantization,
 but the name was kept unchanged as the repo had many users.
 This is why we still refer to these networks as BNN-PYNQ networks.
