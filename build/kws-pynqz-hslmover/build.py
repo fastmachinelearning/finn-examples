@@ -79,7 +79,7 @@ model.model.opset_import[0].version = 11
 model_file = model_file.replace(".onnx", "_opset-11.onnx")
 model.save(model_file)
 
-platform_name = "Pynq-Z1"
+platform_name = "Pynq-Z2"
 output_dir = f"output_{datamover}_{model_name.replace('/','_')}_{platform_name}"
 
 # Configure build
