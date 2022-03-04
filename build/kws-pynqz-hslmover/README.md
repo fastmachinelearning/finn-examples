@@ -36,7 +36,8 @@ make sys-hlsmover
 4. Finally, let's create the SDK project + running it:
 ```shell
 cd vivado_project/sdk
-make hlsmover-sdk gui
+make sdk-hlsmover
+make gui
 ```
 5. This will pop up the SDK, close the "welcome" tab and you should have the baremetal app.
 
