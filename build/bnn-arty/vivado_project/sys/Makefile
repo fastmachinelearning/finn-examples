@@ -14,15 +14,15 @@ help:
 .PHONY: --wrapper
 
 sys-gui: --wrapper
-	vivado -source tcl/script_axidma.tcl -mode gui -tclargs $(MODULE) 0 output_axidma_QONNX_model_Arty-A7
+	vivado -source tcl/script_axidma.tcl -mode gui -tclargs $(MODULE) 0 output_axidma_cnv-w1a1_Arty-A7
 .PHONY: sys-gui
 
 sys-gui-debug: --wrapper
-	vivado -source tcl/script_axidma.tcl -mode gui -tclargs $(MODULE) 1 output_axidma_QONNX_model_Arty-A7
+	vivado -source tcl/script_axidma.tcl -mode gui -tclargs $(MODULE) 1 output_axidma_cnv-w1a1_Arty-A7
 .PHONY: sys-gui-debug
 
 sys: --wrapper
-	vivado -source tcl/script_axidma.tcl -mode batch -tclargs $(MODULE) 0 output_axidma_QONNX_model_Arty-A7
+	vivado -source tcl/script_axidma.tcl -mode batch -tclargs $(MODULE) 0 output_axidma_cnv-w1a1_Arty-A7
 .PHONY: sys
 
 --wrapper-ocm:
@@ -30,15 +30,15 @@ sys: --wrapper
 .PHONY: --wrapper-ocm
 
 sys-ocm-gui: --wrapper-ocm
-	vivado -source tcl/script_axidma_ocm.tcl -mode gui -tclargs $(MODULE) 0 output_axidma_QONNX_model_Arty-A7
+	vivado -source tcl/script_axidma_ocm.tcl -mode gui -tclargs $(MODULE) 0 output_axidma_cnv-w1a1_Arty-A7
 .PHONY: sys-ocm-gui
 
 sys-ocm-gui-debug: --wrapper-ocm
-	vivado -source tcl/script_axidma_ocm.tcl -mode gui -tclargs $(MODULE) 1 output_axidma_QONNX_model_Arty-A7
+	vivado -source tcl/script_axidma_ocm.tcl -mode gui -tclargs $(MODULE) 1 output_axidma_cnv-w1a1_Arty-A7
 .PHONY: sys-ocm-gui-debug
 
 sys-ocm: --wrapper-ocm
-	vivado -source tcl/script_axidma_ocm.tcl -mode batch -tclargs $(MODULE) 0 output_axidma_QONNX_model_Arty-A7
+	vivado -source tcl/script_axidma_ocm.tcl -mode batch -tclargs $(MODULE) 0 output_axidma_cnv-w1a1_Arty-A7
 .PHONY: sys-ocm
 
 gui:
