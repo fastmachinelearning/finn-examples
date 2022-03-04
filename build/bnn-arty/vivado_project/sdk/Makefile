@@ -4,23 +4,24 @@ help:
 	@echo "INFO: make <TAB> to show targets"
 .PHONY: help
 
---axidma-setup:
-	xsct axidma_script.tcl $(ACCNAME)
-.PHONY: --axidma-setup
+--setup:
+	xsct script.tcl $(ACCNAME)
+.PHONY: --setup
 
-axidma-sdk: --axidma-setup
-	rm -f $(ACCNAME)_axidma_standalone/src/helloworld.c
-	cd  $(ACCNAME)_axidma_standalone/src && ln -s ../../common/axidma_main.c main.c && ln -s ../../common/src.h && ln -s ../../common/dst.h
-.PHONY: axidma-sdk
+sdk: --setup
+	rm -f $(ACCNAME)_standalone/src/helloworld.c
+	cd  $(ACCNAME)_standalone/src && ln -s ../../common/main.c main.c && ln -s ../../common/src.h && ln -s ../../common/dst.h
+.PHONY: sdk
 
---hlsmover-setup:
-	xsct hlsmover_script.tcl $(ACCNAME)
-.PHONY: --hlsmover-setup
+--setup-ocm:
+	xsct script_ocm.tcl $(ACCNAME)_ocm
+.PHONY: --setup-ocm
 
-hlsmover-sdk: --hlsmover-setup
-	rm -f $(ACCNAME)_hlsmover_standalone/src/helloworld.c
-	cd  $(ACCNAME)_hlsmover_standalone/src && ln -s ../../common/hlsmover_main.c main.c && ln -s ../../common/src.h && ln -s ../../common/dst.h
-.PHONY: hlsmover-sdk
+sdk-ocm: --setup-ocm
+	rm -f $(ACCNAME)_ocm_standalone/src/helloworld.c
+	cd  $(ACCNAME)_ocm_standalone/src && ln -s ../../common/main.c main.c && ln -s ../../common/src.h && ln -s ../../common/dst.h
+.PHONY: sdk-ocm
+
 
 gui:
 	xsdk --workspace .
@@ -39,8 +40,9 @@ clean:
 	rm -rf $(ACCNAME)*_bsp
 	rm -rf $(ACCNAME)*_platform
 	rm -rf $(PROJECT)*_standalone
-	rm -rf RemoteSystemsTempFiles
-	rm -rf SDK.log
+	rm -rf RemoteSystemsTempFiles	
+	rm -f *.jou
+	rm -f *.log
 	rm -rf webtalk
 	rm -rf .sdk
 	rm -rf .Xil
@@ -49,5 +51,5 @@ clean:
 .PHONY: clean
 
 ultraclean: clean
-	rm -f hdf/*.hdf
+	rm hdf/*.hdf
 .PHONY: ultraclean

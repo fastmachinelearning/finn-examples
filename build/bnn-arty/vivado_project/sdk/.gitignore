@@ -5,3 +5,4 @@ RemoteSystemsTempFiles
 SDK.log
 .metadata
 .sdk
+.temp
