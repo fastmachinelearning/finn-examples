@@ -7,8 +7,8 @@ if { $::argc == 1 } {
     set batch [lindex $::argv 0]
 
 # Build all projects
-configapp -app finn_kws_mlp_w3a3_hlsmover_standalone compiler-misc "-DCMD_N=$batch"
-#configapp -app  finn_kws_mlp_w3a3_hlsmover_standalone 
+configapp -app finn_cnv_w1a1_hlsmover_standalone compiler-misc "-DCMD_N=$batch"
+#configapp -app  finn_cnv_w1a1_hlsmover_standalone 
 #-info compiler-misc
 projects -build
 
@@ -25,14 +25,14 @@ targets -set -nocase -filter {name =~ "ARM*#0"}
 rst -system
 after 3000
 
-fpga ./finn_kws_mlp_w3a3_hlsmover_platform/top_wrapper.bit
-loadhw ./hdf/finn_kws_mlp_w3a3_hlsmover_design_wrapper.hdf
+fpga ./finn_cnv_w1a1_hlsmover_platform/top_wrapper.bit
+loadhw ./hdf/finn_cnv_w1a1_hlsmover_design_wrapper.hdf
 
 # PS7 initialization
-namespace eval xsdb {source ./finn_kws_mlp_w3a3_hlsmover_platform/ps7_init.tcl; ps7_init; ps7_post_config}
+namespace eval xsdb {source ./finn_cnv_w1a1_hlsmover_platform/ps7_init.tcl; ps7_init; ps7_post_config}
 
 # Download the elf
-dow ./finn_kws_mlp_w3a3_hlsmover_standalone/Debug/finn_kws_mlp_w3a3_hlsmover_standalone.elf
+dow ./finn_cnv_w1a1_hlsmover_standalone/Debug/finn_cnv_w1a1_hlsmover_standalone.elf
 
 
 # Insert a breakpoint @ exit

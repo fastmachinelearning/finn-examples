@@ -42,7 +42,7 @@ set_property -dict [list CONFIG.RESET_TYPE {ACTIVE_LOW} CONFIG.RESET_PORT {reset
 apply_board_connection -board_interface "sys_clock" -ip_intf "clk_wizard/clock_CLK_IN1" -diagram $design_name
 
 # Connect system reset
-apply_board_connection -board_interface "reset" -ip_intf "/clk_wizard/resetn" -diagram "finn_kws_mlp_w3a3_ocm_design" 
+apply_board_connection -board_interface "reset" -ip_intf "/clk_wizard/resetn" -diagram "finn_cnv_w1a1_ocm_design" 
 
 # Create instance of MicroBlaze
 create_bd_cell -type ip -vlnv xilinx.com:ip:microblaze:11.0 microblaze_mcu
