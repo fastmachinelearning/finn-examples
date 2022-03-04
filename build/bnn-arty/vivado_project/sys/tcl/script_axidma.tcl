@@ -3,6 +3,8 @@ set module ""
 set debug 0
 set stitched_ip_dir ""
 
+set eembc_power 0
+
 if { $argc == 3 } {
     set module [lindex $argv 0]
     set debug [lindex $argv 1]
@@ -83,9 +85,12 @@ set_property -dict [list CONFIG.C_USE_FPU {2}] [get_bd_cells microblaze_mcu]
 
 # Create UART-lite interface
 create_bd_cell -type ip -vlnv xilinx.com:ip:axi_uartlite:2.0 axi_uart
-apply_board_connection -board_interface "usb_uart" -ip_intf "axi_uart/UART" -diagram $design_name
-set_property -dict [list CONFIG.C_BAUDRATE {115200}] [get_bd_cells axi_uart]
-#set_property -dict [list CONFIG.C_BAUDRATE {9600}] [get_bd_cells axi_uart]
+if { ${eembc_power} } {
+    set_property -dict [list CONFIG.C_BAUDRATE {9600}] [get_bd_cells axi_uart]
+} else {
+    apply_board_connection -board_interface "usb_uart" -ip_intf "axi_uart/UART" -diagram ${design_name}
+    set_property -dict [list CONFIG.C_BAUDRATE {115200}] [get_bd_cells axi_uart]
+}
 apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config { \
     Clk_master {/mig_7series_0/ui_clk (83 MHz)} \
     Clk_slave {Auto} \
@@ -95,10 +100,14 @@ apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config { \
     intc_ip {New AXI Interconnect} \
     master_apm {0}} [get_bd_intf_pins axi_uart/S_AXI]
 
-# Debug UART-lite
-create_bd_port -dir O usb_uart_txd_debug
-connect_bd_net [get_bd_pins /axi_uart/tx] [get_bd_ports usb_uart_txd_debug]
-add_files -fileset constrs_1 -norecurse $proj_dir/../xdc/uart_debug.xdc
+# Forward UART interface to PMOD pins
+if { ${eembc_power} } {
+    create_bd_port -dir O pmod_uart_txd
+    create_bd_port -dir I pmod_uart_rxd
+    connect_bd_net [get_bd_pins /axi_uart/tx] [get_bd_ports pmod_uart_txd]
+    connect_bd_net [get_bd_pins /axi_uart/rx] [get_bd_ports pmod_uart_rxd]
+    add_files -fileset constrs_1 -norecurse $proj_dir/../xdc/uart_pmod.xdc
+}
 
 # General constraints
 add_files -fileset constrs_1 -norecurse $proj_dir/../xdc/general.xdc
@@ -142,21 +151,44 @@ apply_bd_automation -rule xilinx.com:bd_rule:board -config { Board_Interface {re
 
 # Add timer
 create_bd_cell -type ip -vlnv xilinx.com:ip:axi_timer:2.0 axi_timer_mcu
-set_property -dict [list CONFIG.enable_timer2 {0}] [get_bd_cells axi_timer_mcu]
-set_property -dict [list CONFIG.mode_64bit {0} CONFIG.enable_timer2 {0}] [get_bd_cells axi_timer_mcu]
-#set_property -dict [list CONFIG.mode_64bit {1} CONFIG.enable_timer2 {0}] [get_bd_cells axi_timer_mcu]
-#set_property -dict [list CONFIG.mode_64bit {1}] [get_bd_cells axi_timer_mcu]
+set_property -dict [list CONFIG.enable_timer2 {1}] [get_bd_cells axi_timer_mcu]
 
 # Wire timer
 apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config { Clk_master {/mig_7series_0/ui_clk (83 MHz)} Clk_slave {Auto} Clk_xbar {/mig_7series_0/ui_clk (83 MHz)} Master {/microblaze_mcu (Periph)} Slave {/axi_timer_mcu/S_AXI} intc_ip {/microblaze_mcu_axi_periph} master_apm {0}}  [get_bd_intf_pins axi_timer_mcu/S_AXI]
 
-## Add Quad SPI
-#create_bd_cell -type ip -vlnv xilinx.com:ip:axi_quad_spi:3.2 axi_quad_spi_0
-#set_property -dict [list CONFIG.C_SPI_MEMORY {3} CONFIG.C_SPI_MODE {2} CONFIG.C_SCK_RATIO {2}] [get_bd_cells axi_quad_spi_0]
-#apply_bd_automation -rule xilinx.com:bd_rule:board -config { Board_Interface {qspi_flash ( Quad SPI Flash ) } Manual_Source {Auto}}  [get_bd_intf_pins axi_quad_spi_0/SPI_0]
-#apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config { Clk_master {/mig_7series_0/ui_clk (83 MHz)} Clk_slave {Auto} Clk_xbar {/mig_7series_0/ui_clk (83 MHz)} Master {/microblaze_mcu (Periph)} Slave {/axi_quad_spi_0/AXI_LITE} intc_ip {/microblaze_mcu_axi_periph} master_apm {0}}  [get_bd_intf_pins axi_quad_spi_0/AXI_LITE]
-#set_property -dict [list CONFIG.CLKOUT3_USED {true} CONFIG.CLKOUT3_REQUESTED_OUT_FREQ {50} CONFIG.MMCM_CLKOUT2_DIVIDE {20} CONFIG.NUM_OUT_CLKS {3} CONFIG.CLKOUT3_JITTER {151.636} CONFIG.CLKOUT3_PHASE_ERROR {98.575}] [get_bd_cells clk_wizard]
-#connect_bd_net [get_bd_pins clk_wizard/clk_out3] [get_bd_pins axi_quad_spi_0/ext_spi_clk]
+# Add AXI GPIO controlled pin
+if { ${eembc_power} } {
+    # Add AXI GPIO IP
+    create_bd_cell -type ip -vlnv xilinx.com:ip:axi_gpio:2.0 axi_gpio_0
+    # Wire it up to a single output pin (to a PMOD)
+    set_property -dict [list CONFIG.C_GPIO_WIDTH {1} CONFIG.C_ALL_OUTPUTS {1}] [get_bd_cells axi_gpio_0]
+    apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config { \
+        Clk_master {/mig_7series_0/ui_clk (83 MHz)} \
+        Clk_slave {Auto} \
+        Clk_xbar {/mig_7series_0/ui_clk (83 MHz)} \
+        Master {/microblaze_mcu (Periph)} \
+        Slave {/axi_gpio_0/S_AXI} \
+        intc_ip {/microblaze_mcu_axi_periph} \
+        master_apm {0}} [get_bd_intf_pins axi_gpio_0/S_AXI]
+    create_bd_port -dir O pmod_pin
+    connect_bd_net [get_bd_ports pmod_pin] [get_bd_pins axi_gpio_0/gpio_io_o]
+
+    add_files -fileset constrs_1 -norecurse $proj_dir/../xdc/pin_pmod.xdc
+}
+
+# Add Quad SPI for cold boot
+if { ${eembc_power} } {
+    create_bd_cell -type ip -vlnv xilinx.com:ip:axi_quad_spi:3.2 axi_quad_spi_0
+    set_property -dict [list CONFIG.C_SPI_MEMORY {3} CONFIG.C_SPI_MODE {2} CONFIG.C_SCK_RATIO {2}] [get_bd_cells axi_quad_spi_0]
+    apply_bd_automation -rule xilinx.com:bd_rule:board -config { Board_Interface {qspi_flash ( Quad SPI Flash ) } Manual_Source {Auto}}  [get_bd_intf_pins axi_quad_spi_0/SPI_0]
+    apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config { Clk_master {/mig_7series_0/ui_clk (83 MHz)} Clk_slave {Auto} Clk_xbar {/mig_7series_0/ui_clk (83 MHz)} Master {/microblaze_mcu (Periph)} Slave {/axi_quad_spi_0/AXI_LITE} intc_ip {/microblaze_mcu_axi_periph} master_apm {0}}  [get_bd_intf_pins axi_quad_spi_0/AXI_LITE]
+    apply_bd_automation -rule xilinx.com:bd_rule:clkrst -config {Clk "/clk_wizard/clk_out1 (166 MHz)" }  [get_bd_pins axi_quad_spi_0/ext_spi_clk]
+
+#    set_property -dict [list CONFIG.CLKOUT3_USED {true} CONFIG.CLKOUT3_REQUESTED_OUT_FREQ {50} CONFIG.MMCM_CLKOUT2_DIVIDE {20} CONFIG.NUM_OUT_CLKS {3} CONFIG.CLKOUT3_JITTER {151.636} CONFIG.CLKOUT3_PHASE_ERROR {98.575}] [get_bd_cells clk_wizard]
+#    connect_bd_net [get_bd_pins clk_wizard/clk_out3] [get_bd_pins axi_quad_spi_0/ext_spi_clk]
+#    set_property -dict [list CONFIG.C_SPI_MEMORY {3}] [get_bd_cells axi_quad_spi_0]
+    add_files -fileset constrs_1 -norecurse $proj_dir/../xdc/qspi.xdc
+}
 
 # Add FINN IP(s)
 create_bd_cell -type ip -vlnv xilinx_finn:finn:finn_design:1.0 finn_design
@@ -218,25 +250,6 @@ connect_bd_net [get_bd_pins mig_7series_0/aresetn] [get_bd_pins proc_sys_reset_m
 # Address Editor
 assign_bd_address [get_bd_addr_segs {mig_7series_0/memmap/memaddr }]
 
-## ILAs
-#set_property HDL_ATTRIBUTE.DEBUG true [get_bd_intf_nets {axi_dma_M_AXIS_MM2S}]
-#set_property HDL_ATTRIBUTE.DEBUG true [get_bd_intf_nets {finn_design_axis_dwidth_converter_M_AXIS}]
-#set_property HDL_ATTRIBUTE.DEBUG true [get_bd_intf_nets {finn_design_m_axis_0}]
-#set_property HDL_ATTRIBUTE.DEBUG true [get_bd_intf_nets {axi_dma_M_AXI_MM2S}]
-#set_property HDL_ATTRIBUTE.DEBUG true [get_bd_intf_nets {axi_dma_M_AXI_S2MM}]
-#set_property HDL_ATTRIBUTE.DEBUG true [get_bd_intf_nets {microblaze_mcu_axi_periph_M02_AXI}]
-#
-#apply_bd_automation -rule xilinx.com:bd_rule:debug -dict [list \
-#    [get_bd_intf_nets finn_design_axis_dwidth_converter_M_AXIS] {AXIS_SIGNALS "Data and Trigger" CLK_SRC "/clk_wizard/clk_out3" SYSTEM_ILA "Auto" APC_EN "0" } \
-#    [get_bd_intf_nets axi_dma_M_AXIS_MM2S] {AXIS_SIGNALS "Data and Trigger" CLK_SRC "/clk_wizard/clk_out3" SYSTEM_ILA "Auto" APC_EN "0" } \
-#    [get_bd_intf_nets finn_design_m_axis_0] {AXIS_SIGNALS "Data and Trigger" CLK_SRC "/clk_wizard/clk_out3" SYSTEM_ILA "Auto" APC_EN "0" } \
-#    [get_bd_intf_nets microblaze_mcu_axi_periph_M02_AXI] {AXI_R_ADDRESS "Data and Trigger" AXI_R_DATA "Data and Trigger" AXI_W_ADDRESS "Data and Trigger" AXI_W_DATA "Data and Trigger" AXI_W_RESPONSE "Data and Trigger" CLK_SRC "/mig_7series_0/ui_clk" SYSTEM_ILA "Auto" APC_EN "0" } \
-#    [get_bd_intf_nets axi_dma_M_AXI_MM2S] {AXI_R_ADDRESS "Data and Trigger" AXI_R_DATA "Data and Trigger" AXI_W_ADDRESS "Data and Trigger" AXI_W_DATA "Data and Trigger" AXI_W_RESPONSE "Data and Trigger" CLK_SRC "/clk_wizard/clk_out3" SYSTEM_ILA "Auto" APC_EN "0" } \
-#    [get_bd_intf_nets axi_dma_M_AXI_S2MM] {AXI_R_ADDRESS "Data and Trigger" AXI_R_DATA "Data and Trigger" AXI_W_ADDRESS "Data and Trigger" AXI_W_DATA "Data and Trigger" AXI_W_RESPONSE "Data and Trigger" CLK_SRC "/clk_wizard/clk_out3" SYSTEM_ILA "Auto" APC_EN "0" } \
-#]
-#
-##set_property -dict [list CONFIG.C_BRAM_CNT {51} CONFIG.C_DATA_DEPTH {2048}] [get_bd_cells system_ila_0]
-
 # Validate the design block we created
 validate_bd_design
 
@@ -247,6 +260,11 @@ save_bd_design
 #make_wrapper -files [get_files $proj_dir/$proj.srcs/sources_1/bd/$design_name/$design_name.bd] -top
 #add_files -norecurse $proj_dir/$proj.srcs/sources_1/bd/$design_name/hdl/$design_name\_wrapper.v
 add_files -norecurse $proj_dir/../$design_name\_wrapper.v
+
+# In the Verilog wrapper, enable configuration for the EEMBC power setup
+if { ${eembc_power} } {
+    set_property verilog_define EEMBC_POWER=1 [current_fileset]
+}
 
 update_compile_order -fileset sources_1
 
