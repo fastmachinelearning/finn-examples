@@ -70,8 +70,10 @@ apply_bd_automation -rule xilinx.com:bd_rule:microblaze -config { \
     clk {/mig_7series_0/ui_clk (83 MHz)} \
     debug_module {Debug Only} \
     ecc {None} \
-    local_mem {128KB} \
+    local_mem {32KB} \
     preset {None} } [get_bd_cells microblaze_mcu]
+
+set_property -dict [list CONFIG.C_ADDR_TAG_BITS {18} CONFIG.C_CACHE_BYTE_SIZE {1024} CONFIG.C_DCACHE_ADDR_TAG {18} CONFIG.C_DCACHE_BYTE_SIZE {1024}] [get_bd_cells microblaze_mcu]
 
 # Rename Processor System Reset for MIG
 set_property name proc_sys_reset_mig [get_bd_cells rst_mig_7series_0_83M]
