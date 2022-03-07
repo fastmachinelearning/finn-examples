@@ -194,12 +194,12 @@ if { ${eembc_power} } {
 create_bd_cell -type ip -vlnv xilinx_finn:finn:finn_design:1.0 finn_design
 
 # Add data width converter for AXI-stream
-create_bd_cell -type ip -vlnv xilinx.com:ip:axis_dwidth_converter:1.1 finn_design_axis_dwidth_converter
-set_property -dict [list CONFIG.S_TDATA_NUM_BYTES.VALUE_SRC USER] [get_bd_cells finn_design_axis_dwidth_converter]
-set_property -dict [list CONFIG.M_TDATA_NUM_BYTES {10}] [get_bd_cells finn_design_axis_dwidth_converter]
+##create_bd_cell -type ip -vlnv xilinx.com:ip:axis_dwidth_converter:1.1 finn_design_axis_dwidth_converter
+##set_property -dict [list CONFIG.S_TDATA_NUM_BYTES.VALUE_SRC USER] [get_bd_cells finn_design_axis_dwidth_converter]
+##set_property -dict [list CONFIG.M_TDATA_NUM_BYTES {1}] [get_bd_cells finn_design_axis_dwidth_converter]
 
 # Connect dwidth converter to FINN IP(s)
-connect_bd_intf_net [get_bd_intf_pins finn_design_axis_dwidth_converter/M_AXIS] [get_bd_intf_pins finn_design/s_axis_0]
+##connect_bd_intf_net [get_bd_intf_pins finn_design_axis_dwidth_converter/M_AXIS] [get_bd_intf_pins finn_design/s_axis_0]
 
 # Add reset IP for FINN IP
 create_bd_cell -type ip -vlnv xilinx.com:ip:proc_sys_reset:5.0 proc_sys_reset_finn
@@ -211,8 +211,8 @@ connect_bd_net [get_bd_pins proc_sys_reset_finn/peripheral_aresetn] [get_bd_pins
 connect_bd_net [get_bd_pins proc_sys_reset_finn/ext_reset_in] [get_bd_pins mig_7series_0/ui_clk_sync_rst]
 connect_bd_net [get_bd_pins proc_sys_reset_finn/mb_debug_sys_rst] [get_bd_pins mdm_1/Debug_SYS_Rst]
 connect_bd_net [get_bd_pins proc_sys_reset_finn/dcm_locked] [get_bd_pins mig_7series_0/mmcm_locked]
-connect_bd_net [get_bd_pins finn_design_axis_dwidth_converter/aclk] [get_bd_pins clk_wizard/clk_out3]
-connect_bd_net [get_bd_pins finn_design_axis_dwidth_converter/aresetn] [get_bd_pins proc_sys_reset_finn/peripheral_aresetn]
+##connect_bd_net [get_bd_pins finn_design_axis_dwidth_converter/aclk] [get_bd_pins clk_wizard/clk_out3]
+##connect_bd_net [get_bd_pins finn_design_axis_dwidth_converter/aresetn] [get_bd_pins proc_sys_reset_finn/peripheral_aresetn]
 
 # Add AXI DMA IP
 create_bd_cell -type ip -vlnv xilinx.com:ip:axi_dma:7.1 axi_dma
@@ -221,7 +221,8 @@ set_property -dict [list CONFIG.c_m_axi_mm2s_data_width {32} CONFIG.c_m_axis_mm2
 set_property -dict [list CONFIG.c_include_mm2s_dre {1} CONFIG.c_include_s2mm_dre {1}] [get_bd_cells axi_dma]
 
 # Wire AXI DMA IP
-connect_bd_intf_net [get_bd_intf_pins axi_dma/M_AXIS_MM2S] [get_bd_intf_pins finn_design_axis_dwidth_converter/S_AXIS]
+##connect_bd_intf_net [get_bd_intf_pins axi_dma/M_AXIS_MM2S] [get_bd_intf_pins finn_design_axis_dwidth_converter/S_AXIS]
+connect_bd_intf_net [get_bd_intf_pins axi_dma/M_AXIS_MM2S] [get_bd_intf_pins finn_design/s_axis_0]
 connect_bd_intf_net [get_bd_intf_pins finn_design/m_axis_0] [get_bd_intf_pins axi_dma/S_AXIS_S2MM]
 connect_bd_net [get_bd_pins axi_dma/m_axi_mm2s_aclk] [get_bd_pins clk_wizard/clk_out3]
 connect_bd_net [get_bd_pins axi_dma/m_axi_s2mm_aclk] [get_bd_pins clk_wizard/clk_out3]
