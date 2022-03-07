@@ -334,7 +334,7 @@ int main(int argc, char** argv) {
         xil_printf("INFO: Accelerator validation: PASS!\r\n");
 #else
     xil_printf("INFO: *** ********************************** ***\r\n");
-    xil_printf("INFO: *** WE EXPECT A MODEL ACCURACY ~ 84.8%% ***\r\n");
+    xil_printf("INFO: *** WE EXPECT A MODEL ACCURACY ~ 84.6%% ***\r\n");
     xil_printf("INFO: *** WE COMPARE AGAINST GROUND TRUTH    ***\r\n");
     xil_printf("INFO: *** ********************************** ***\r\n");
 #endif
