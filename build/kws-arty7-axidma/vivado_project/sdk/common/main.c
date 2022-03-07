@@ -17,9 +17,11 @@
 #endif
 #else
 #define ITER_N 50
-#define CMD_CNT (10102)
+//#define CMD_CNT (10102)
+#define CMD_CNT (10)
 #ifndef CMD_N
-#define CMD_N (10102)
+//#define CMD_N (10102)
+#define CMD_N (10)
 #endif
 #endif
 #define INPUT_N_FEATURES (490)
@@ -305,9 +307,9 @@ int main(int argc, char** argv) {
     hw_errors = 0;
     for (int i = 0; i < OUTPUT_N_FEATURES * CMD_N; i++) {
         if ((rx_buffer_ptr)[i] != (rx_buffer_gld_ptr)[i]) {
-#ifdef __DEBUG__
+//#ifdef __DEBUG__
             xil_printf("ERROR: [%d]: HW accelerator %d != SW reference implementation %d !!!\r\n", i, (rx_buffer_ptr)[i], (rx_buffer_gld_ptr)[i]);
-#endif
+//#endif
             hw_errors++;
         }
     }
